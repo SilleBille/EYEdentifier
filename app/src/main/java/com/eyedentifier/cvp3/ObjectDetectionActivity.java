@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.SystemClock;
+import android.speech.tts.TextToSpeech;
 import android.util.Size;
 import android.util.TypedValue;
 import android.widget.Toast;
@@ -21,6 +22,7 @@ import com.eyedentifier.cvp3.tracking.MultiBoxTracker;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 
 
@@ -112,7 +114,7 @@ public class ObjectDetectionActivity extends CameraActivity {
                         paint.setStrokeWidth(2.0f);
 
                         final List<Classifier.Recognition> mappedRecognitions =
-                                new LinkedList<Classifier.Recognition>();
+                                new LinkedList<>();
 
                         for (final Classifier.Recognition result : results) {
                             final RectF location = result.getLocation();
@@ -122,6 +124,11 @@ public class ObjectDetectionActivity extends CameraActivity {
                                 cropToFrameTransform.mapRect(location);
                                 result.setLocation(location);
                                 mappedRecognitions.add(result);
+
+                                if(!tts.isSpeaking()) {
+                                    tts.speak(result.getTitle(), TextToSpeech.QUEUE_FLUSH, null,
+                                            ObjectDetectionActivity.class.getName());
+                                }
                             }
                         }
 
@@ -250,5 +257,6 @@ public class ObjectDetectionActivity extends CameraActivity {
     public void onSetDebug(final boolean debug) {
         detector.enableStatLogging(debug);
     }
+
 
 }

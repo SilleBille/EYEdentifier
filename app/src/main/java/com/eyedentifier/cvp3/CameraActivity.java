@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Trace;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,9 +30,10 @@ import com.eyedentifier.cvp3.env.ImageUtils;
 import com.eyedentifier.cvp3.env.Logger;
 
 import java.nio.ByteBuffer;
+import java.util.Locale;
 
 public abstract class CameraActivity extends AppCompatActivity
-        implements ImageReader.OnImageAvailableListener{
+        implements ImageReader.OnImageAvailableListener, TextToSpeech.OnInitListener{
     private static final Logger LOGGER = new Logger();
 
     private static final int PERMISSIONS_REQUEST = 1;
@@ -55,6 +57,8 @@ public abstract class CameraActivity extends AppCompatActivity
 
     private boolean debug = false;
 
+    TextToSpeech tts;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +66,8 @@ public abstract class CameraActivity extends AppCompatActivity
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
+
+        tts = new TextToSpeech(this, this);
 
         if (hasPermission()) {
             setFragment();
@@ -282,6 +288,14 @@ public abstract class CameraActivity extends AppCompatActivity
             LOGGER.e(e, "Exception!");
         }
 
+        // Shutdown TTS
+        if(tts != null){
+
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onPause();
+
         super.onPause();
     }
 
@@ -360,6 +374,18 @@ public abstract class CameraActivity extends AppCompatActivity
             default:
                 return 0;
         }
+    }
+
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            int result = tts.setLanguage(Locale.US);
+            if (result == TextToSpeech.LANG_MISSING_DATA ||
+                    result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                LOGGER.e("This Language is not supported");
+            }
+        } else
+            LOGGER.e("error", "Initilization Failed!");
     }
 
     protected abstract void processImage();

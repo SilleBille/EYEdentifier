@@ -9,6 +9,7 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.media.ImageReader;
 import android.os.SystemClock;
+import android.speech.tts.TextToSpeech;
 import android.util.Size;
 import android.util.TypedValue;
 
@@ -226,6 +227,10 @@ public class YoloDetectorActivity extends CameraActivity implements ImageReader.
                             cropToFrameTransform.mapRect(location);
                             result.setLocation(location);
                             mappedRecognitions.add(result);
+                            if(!tts.isSpeaking()) {
+                                tts.speak(result.getTitle(), TextToSpeech.QUEUE_FLUSH, null,
+                                        YoloDetectorActivity.class.getName());
+                            }
                         }
                     }
 
