@@ -41,7 +41,7 @@ public class ObjectDetectionActivity extends CameraActivity {
     private static final boolean MAINTAIN_ASPECT = true;
 
 
-    private static final Size DESIRED_PREVIEW_SIZE = new Size(1920, 1080);
+    private static final Size DESIRED_PREVIEW_SIZE = new Size(1280, 720);
 
     private static final boolean SAVE_PREVIEW_BITMAP = false;
     private static final float TEXT_SIZE_DIP = 10;
