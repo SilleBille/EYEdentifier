@@ -32,22 +32,12 @@ public class YoloDetectorActivity extends CameraActivity implements ImageReader.
     private static final String YOLO_OUTPUT_NAMES = "output";
     private static final int YOLO_BLOCK_SIZE = 32;
 
-    // Which detection model to use: by default uses Tensorflow Object Detection API frozen
-    // checkpoints.  Optionally use legacy Multibox (trained using an older version of the API)
-    // or YOLO.
-    private enum DetectorMode {
-        TF_OD_API, MULTIBOX, YOLO;
-    }
-    private static final DetectorMode MODE = DetectorMode.YOLO;
-
     // Minimum detection confidence to track a detection.
-    private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.6f;
-    private static final float MINIMUM_CONFIDENCE_MULTIBOX = 0.1f;
     private static final float MINIMUM_CONFIDENCE_YOLO = 0.25f;
 
     private static final boolean MAINTAIN_ASPECT = true;
 
-    private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 480);
+    private static final Size DESIRED_PREVIEW_SIZE = new Size(1280, 720);
 
     private static final boolean SAVE_PREVIEW_BITMAP = false;
     private static final float TEXT_SIZE_DIP = 10;
@@ -209,55 +199,43 @@ public class YoloDetectorActivity extends CameraActivity implements ImageReader.
         }
 
         runInBackground(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        LOGGER.i("Running detection on image " + currTimestamp);
-                        final long startTime = SystemClock.uptimeMillis();
-                        final List<Classifier.Recognition> results = detector.recognizeImage(croppedBitmap);
-                        lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
+            new Runnable() {
+                @Override
+                public void run() {
+                    LOGGER.i("Running detection on image " + currTimestamp);
+                    final long startTime = SystemClock.uptimeMillis();
+                    final List<Classifier.Recognition> results = detector.recognizeImage(croppedBitmap);
+                    lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
 
-                        cropCopyBitmap = Bitmap.createBitmap(croppedBitmap);
-                        final Canvas canvas = new Canvas(cropCopyBitmap);
-                        final Paint paint = new Paint();
-                        paint.setColor(Color.RED);
-                        paint.setStyle(Paint.Style.STROKE);
-                        paint.setStrokeWidth(2.0f);
+                    cropCopyBitmap = Bitmap.createBitmap(croppedBitmap);
+                    final Canvas canvas = new Canvas(cropCopyBitmap);
+                    final Paint paint = new Paint();
+                    paint.setColor(Color.RED);
+                    paint.setStyle(Paint.Style.STROKE);
+                    paint.setStrokeWidth(2.0f);
 
-                        float minimumConfidence = MINIMUM_CONFIDENCE_TF_OD_API;
-                        switch (MODE) {
-                            case TF_OD_API:
-                                minimumConfidence = MINIMUM_CONFIDENCE_TF_OD_API;
-                                break;
-                            case MULTIBOX:
-                                minimumConfidence = MINIMUM_CONFIDENCE_MULTIBOX;
-                                break;
-                            case YOLO:
-                                minimumConfidence = MINIMUM_CONFIDENCE_YOLO;
-                                break;
+
+                    final List<Classifier.Recognition> mappedRecognitions =
+                            new LinkedList<>();
+
+                    for (final Classifier.Recognition result : results) {
+                        final RectF location = result.getLocation();
+                        if (location != null && result.getConfidence() >= MINIMUM_CONFIDENCE_YOLO) {
+                            canvas.drawRect(location, paint);
+
+                            cropToFrameTransform.mapRect(location);
+                            result.setLocation(location);
+                            mappedRecognitions.add(result);
                         }
-
-                        final List<Classifier.Recognition> mappedRecognitions =
-                                new LinkedList<Classifier.Recognition>();
-
-                        for (final Classifier.Recognition result : results) {
-                            final RectF location = result.getLocation();
-                            if (location != null && result.getConfidence() >= minimumConfidence) {
-                                canvas.drawRect(location, paint);
-
-                                cropToFrameTransform.mapRect(location);
-                                result.setLocation(location);
-                                mappedRecognitions.add(result);
-                            }
-                        }
-
-                        tracker.trackResults(mappedRecognitions, luminanceCopy, currTimestamp);
-                        trackingOverlay.postInvalidate();
-
-                        requestRender();
-                        computingDetection = false;
                     }
-                });
+
+                    tracker.trackResults(mappedRecognitions, luminanceCopy, currTimestamp);
+                    trackingOverlay.postInvalidate();
+
+                    requestRender();
+                    computingDetection = false;
+                }
+            });
     }
 
     @Override

@@ -27,19 +27,19 @@ import java.util.Vector;
 public class ObjectDetectionActivity extends CameraActivity {
     private static final Logger LOGGER = new Logger();
 
-    private static final int TF_OD_API_INPUT_SIZE = 300;
+    private static final int TF_OD_API_INPUT_SIZE = 416;
     private static final String TF_OD_API_MODEL_FILE =
-            "file:///android_asset/frozen_ssd_mobilenet.pb";
+            "file:///android_asset/frozen_ssd_voc.pb";
     private static final String TF_OD_API_LABELS_FILE = "file:///android_asset/labels_voc.txt";
 
 
     // Minimum detection confidence to track a detection.
-    private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.6f;
+    private static final float MINIMUM_CONFIDENCE_TF_OD_API = 0.5f;
 
-    private static final boolean MAINTAIN_ASPECT = false;
+    private static final boolean MAINTAIN_ASPECT = true;
 
 
-    private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 480);
+    private static final Size DESIRED_PREVIEW_SIZE = new Size(1920, 1080);
 
     private static final boolean SAVE_PREVIEW_BITMAP = false;
     private static final float TEXT_SIZE_DIP = 10;
