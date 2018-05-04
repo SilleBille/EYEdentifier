@@ -25,6 +25,10 @@ import com.eyedentifier.cvp3.env.SplitTimer;
 
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -52,29 +56,8 @@ public class TensorFlowYoloDetector implements Classifier {
             9.42, 5.11,
             16.62, 10.52
     };
-
-    private static final String[] LABELS = {
-        "aeroplane",
-        "bicycle",
-        "bird",
-        "boat",
-        "bottle",
-        "bus",
-        "car",
-        "cat",
-        "chair",
-        "cow",
-        "diningtable",
-        "dog",
-        "horse",
-        "motorbike",
-        "person",
-        "pottedplant",
-        "sheep",
-        "sofa",
-        "train",
-        "tvmonitor"
-    };
+    private static List<String> labelList;
+    private static String[] LABELS;
 
     // Config values.
     private String inputName;
@@ -103,11 +86,28 @@ public class TensorFlowYoloDetector implements Classifier {
             final int inputSize,
             final String inputName,
             final String outputName,
-            final int blockSize) {
+            final int blockSize,
+            final String yoloLabelFile) throws IOException {
         TensorFlowYoloDetector d = new TensorFlowYoloDetector();
         d.inputName = inputName;
         d.inputSize = inputSize;
 
+        labelList = new ArrayList<>();
+        InputStream labelsInput;
+        String actualFilename = yoloLabelFile.split("file:///android_asset/")[1];
+        labelsInput = assetManager.open(actualFilename);
+        BufferedReader br;
+        br = new BufferedReader(new InputStreamReader(labelsInput));
+        String line;
+        // Skip first line since it's a keyword ???
+        br.readLine();
+        while((line = br.readLine()) != null) {
+            LOGGER.w(line);
+            labelList.add(line);
+        }
+        br.close();
+
+        LABELS = labelList.toArray(new String[0]);
         // Pre-allocate buffers.
         d.outputNames = outputName.split(",");
         d.intValues = new int[inputSize * inputSize];

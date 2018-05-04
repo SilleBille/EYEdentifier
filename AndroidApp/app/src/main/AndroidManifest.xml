@@ -13,16 +13,18 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".ObjectDetectionActivity"
+        android:theme="@style/AppTheme"
+        android:largeHeap="true">
+        <activity android:name=".ObjectDetectionMobileNetActivity"
             android:screenOrientation="portrait"
-            android:label="@string/activity_name_object_detection">
+            android:label="@string/activity_name_object_detection_mobilenet">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".YoloDetectorActivity"
             android:screenOrientation="portrait"
             android:label="@string/activity_name_yolo_detection">
@@ -32,6 +34,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

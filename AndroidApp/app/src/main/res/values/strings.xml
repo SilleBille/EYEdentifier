@@ -2,6 +2,7 @@
     <string name="app_name">EYEdentifier</string>
     <string name="app_permissions">Camera AND storage permission are required for this demo</string>
     <string name="camera_error">This device doesn\'t support Camera 2 API.</string>
-    <string name="activity_name_object_detection">TF Object Detection</string>
+    <string name="activity_name_object_detection_mobilenet">TF - MobileNet</string>
+    <string name="activity_name_object_detection_vgg">TF - VGG</string>
     <string name="activity_name_yolo_detection">Yolo Detection</string>
 </resources>

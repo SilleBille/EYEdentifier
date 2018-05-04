@@ -12,12 +12,14 @@ import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
 import android.util.Size;
 import android.util.TypedValue;
+import android.widget.Toast;
 
 import com.eyedentifier.cvp3.env.BorderedText;
 import com.eyedentifier.cvp3.env.ImageUtils;
 import com.eyedentifier.cvp3.env.Logger;
 import com.eyedentifier.cvp3.tracking.MultiBoxTracker;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -28,6 +30,8 @@ public class YoloDetectorActivity extends CameraActivity implements ImageReader.
     // DarkFlow (https://github.com/thtrieu/darkflow). Sample command:
     // ./flow --model cfg/tiny-yolo-voc.cfg --load bin/tiny-yolo-voc.weights --savepb --verbalise
     private static final String YOLO_MODEL_FILE = "file:///android_asset/tiny-yolo-voc.pb";
+    private static final String YOLO_LABELS_FILE = "file:///android_asset/labels_voc.txt";
+
     private static final int YOLO_INPUT_SIZE = 416;
     private static final String YOLO_INPUT_NAME = "input";
     private static final String YOLO_OUTPUT_NAMES = "output";
@@ -71,18 +75,28 @@ public class YoloDetectorActivity extends CameraActivity implements ImageReader.
                         TypedValue.COMPLEX_UNIT_DIP, TEXT_SIZE_DIP, getResources().getDisplayMetrics());
         borderedText = new BorderedText(textSizePx);
         borderedText.setTypeface(Typeface.MONOSPACE);
-
-        tracker = new MultiBoxTracker(this);
-
-        detector =
-                TensorFlowYoloDetector.create(
-                        getAssets(),
-                        YOLO_MODEL_FILE,
-                        YOLO_INPUT_SIZE,
-                        YOLO_INPUT_NAME,
-                        YOLO_OUTPUT_NAMES,
-                        YOLO_BLOCK_SIZE);
         int cropSize = YOLO_INPUT_SIZE;
+        tracker = new MultiBoxTracker(this);
+        try {
+            detector =
+                    TensorFlowYoloDetector.create(
+                            getAssets(),
+                            YOLO_MODEL_FILE,
+                            YOLO_INPUT_SIZE,
+                            YOLO_INPUT_NAME,
+                            YOLO_OUTPUT_NAMES,
+                            YOLO_BLOCK_SIZE,
+                            YOLO_LABELS_FILE);
+
+        }
+        catch (final IOException e) {
+            LOGGER.e("Exception initializing classifier!", e);
+            Toast toast =
+                    Toast.makeText(
+                            getApplicationContext(), "Classifier could not be initialized", Toast.LENGTH_SHORT);
+            toast.show();
+            finish();
+        }
 
 
         previewWidth = size.getWidth();

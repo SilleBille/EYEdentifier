@@ -32,7 +32,7 @@ To run the project in Android Studio:
 4. Click on your mobile device and click `Run`
 5. Wait for the gradle build and the app will be installed in your mobile
 
-**App Names:** `TF Object Detection` and `Yolo Detection`
+**App Names:** `TF - MobileNet` and `Yolo Detection`
 
 **NOTE:**
 * The app compiles against latest SDK: `27`
