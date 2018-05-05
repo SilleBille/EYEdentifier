@@ -4,7 +4,9 @@ Download and install the Tensorflow object Detection API by following the instru
 Under the directory named 'data', download the pascal VOC dataset using the following commands:
 
 wget http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar
+
 tar -xvf VOCtrainval_11-May-2012.tar
+
 python object_detection/dataset_tools/create_pascal_tf_record.py \
     --label_map_path=object_detection/data/pascal_label_map.pbtxt \
     --data_dir=VOCdevkit --year=VOC2012 --set=train \
