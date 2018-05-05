@@ -9,7 +9,7 @@ Replace the object_detection/builders/model_builder_test.py with the provided mo
 Exceute python object_detection/builders/model_builder_test.py to ensure that new feature extractor is intgerated succesfully.
 
 Under the directory named 'data', download the pascal VOC dataset using the following commands:
-# From tensorflow/models/research/
+
 wget http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar
 tar -xvf VOCtrainval_11-May-2012.tar
 python object_detection/dataset_tools/create_pascal_tf_record.py \
